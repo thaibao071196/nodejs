@@ -8,12 +8,10 @@ import Matter, {
   Mouse,
   MouseConstraint,
   Events,
-  Collision,
-  Pairs,
-  Pair,
+  Vector
 } from "matter-js";
-import { useDidUpdate } from "../shared-hooks/useDidUpdate";
 
+import { useDidUpdate } from "../shared-hooks/useDidUpdate";
 import iconCrypto from "../assets/images/icon-crypto.png";
 
 const random = (min, max) => {
@@ -32,6 +30,7 @@ const Scene = () => {
           x: random(-0.003, 0.003),
           y: random(-0.003, 0.003),
         });
+
       }
     }, 1000);
   }, [bubbles]);
@@ -60,6 +59,9 @@ const Scene = () => {
         },
       },
     });
+
+    const ballCategory = 0x0002;
+    const wallCategory = 0x0001;
 
     //Create crypto Bubble
     function createCryptoBubble(
@@ -135,7 +137,11 @@ const Scene = () => {
             random(0, window.innerHeight),
             60,
             {
-              restitution: 0.5,
+              restitution: 0.8,
+              collisionFilter:{
+                category: ballCategory,
+                mask: wallCategory,
+              },
               render: {
                 sprite: {
                   texture: url,
@@ -143,7 +149,6 @@ const Scene = () => {
               },
             }
           );
-
           World.add(world, bubble);
           tempBubbles.push(bubble);
         });
@@ -159,6 +164,9 @@ const Scene = () => {
       3,
       {
         isStatic: true,
+        collisionFilter:{
+          mask :ballCategory
+        },
         render: {
           fillStyle: "transparent",
         },
@@ -171,6 +179,9 @@ const Scene = () => {
       3,
       {
         isStatic: true,
+        collisionFilter:{
+          mask :ballCategory
+        },
         render: {
           fillStyle: "transparent",
         },
@@ -183,6 +194,9 @@ const Scene = () => {
       window.innerHeight,
       {
         isStatic: true,
+        collisionFilter:{
+          mask :ballCategory
+        },
         render: {
           fillStyle: "transparent",
         },
@@ -195,6 +209,9 @@ const Scene = () => {
       window.innerHeight,
       {
         isStatic: true,
+        collisionFilter:{
+          mask :ballCategory
+        },
         render: {
           fillStyle: "transparent",
         },
@@ -209,15 +226,7 @@ const Scene = () => {
       rightWall,
     ]);
 
-    Events.on(mouseConstraint, "mousemove", function (event) {
-      var chooseBubble = Matter.Query.point(tempBubbles, event.mouse.position);
 
-      if (chooseBubble[0]) {
-       console.log(chooseBubble[0])
-      }
-    });
-
-     
     // run the renderer
     Render.run(render);
 
