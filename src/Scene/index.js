@@ -8,6 +8,7 @@ import Matter, {
   Mouse,
   MouseConstraint,
   Events,
+  Pairs,
 } from "matter-js";
 
 import MatterAttractors from 'matter-attractors';
@@ -88,16 +89,16 @@ const Scene = () => {
    
 
   // *************** create movement for bubble *******************//
-  useDidUpdate(() => {
-    setInterval(() => {
-      for (const bubble of bubbles) {
-        Matter.Body.applyForce(bubble, bubble.position, {
-          x: random(-0.003, 0.003),
-          y: random(-0.003, 0.003),
-        });
-      }
-    }, 1000);
-  }, [bubbles]);
+  // useDidUpdate(() => {
+  //   setInterval(() => {
+  //     for (const bubble of bubbles) {
+  //       Matter.Body.applyForce(bubble, bubble.position, {
+  //         x: random(-0.003, 0.003),
+  //         y: random(-0.003, 0.003),
+  //       });
+  //     }
+  //   }, 1000);
+  // }, [bubbles]);
 
   useEffect(() => {
     // render global canvas
@@ -123,8 +124,9 @@ const Scene = () => {
       },
     });
 
+
     const tempBubbles = [];
-      for (let i = 0; i < 20; i++) {
+      for (let i = 0; i < 2; i++) {
         createCryptoBubble("SAFE", 12.5, iconCrypto, 60, (url) => {
           const bubble = Bodies.circle(
             random(0, window.innerWidth),
@@ -134,12 +136,10 @@ const Scene = () => {
               restitution: 0.8,
               force:{x:random(-0.01,0.01),y:random(-0.01,0.01)},
               // collisionFilter:{
-                // category: ballCategory,
-                // mask: wallCategory,
+              //   category: ballCategory,
+              //   mask: wallCategory,
               // },
-              collision: {
-                depth: -10,
-              },
+              inertia:Infinity,
               render: {
                 sprite: {
                   texture: url,
@@ -164,12 +164,16 @@ const Scene = () => {
     ]);
 
     Events.on(engine,'collisionStart',function(event){
-    console.log(event)
-    const pair = event.pairs[0];
-    Matter.Body.set(pair.bodyB,{depth: -5})
+      console.log(event)
+      const pair = event.pairs[0].collision;
+      console.log(event.pairs[0])
+      const collision = Matter.Collision.create(pair.bodyA,pair.bodyB)
+        for(const bubble of tempBubbles){
+          if(bubble.id === pair.bodyB.id && (pair.bodyA.label || pair.bodyB.label) !== "Rectangle Body" ){
+          }
+        }
     })
 
-    
     // run the renderer
     Render.run(render);
 
