@@ -10,6 +10,8 @@ import Matter, {
   Events,
 } from "matter-js";
 
+import MatterAttractors from 'matter-attractors';
+
 import { useDidUpdate } from "../shared-hooks/useDidUpdate";
 import iconCrypto from "../assets/images/icon-crypto.png";
 
@@ -28,6 +30,9 @@ const Scene = () => {
   const wallCategory = 0x0001;
   const world = engine.world;
 
+   // *************** create gravity enviroment ********************* //
+   engine.gravity.y = 0;
+
   //***************************Create wall*************************************
   const topWall = Bodies.rectangle(
     window.innerWidth / 2,
@@ -36,9 +41,6 @@ const Scene = () => {
     3,
     {
       isStatic: true,
-      collisionFilter:{
-        mask :ballCategory
-      },
       render: {
         fillStyle: "transparent",
       },
@@ -52,9 +54,6 @@ const Scene = () => {
     3,
     {
       isStatic: true,
-      collisionFilter:{
-        mask :ballCategory
-      },
       render: {
         fillStyle: "transparent",
       },
@@ -68,9 +67,6 @@ const Scene = () => {
     window.innerHeight,
     {
       isStatic: true,
-      collisionFilter:{
-        mask :ballCategory
-      },
       render: {
         fillStyle: "transparent",
       },
@@ -84,18 +80,12 @@ const Scene = () => {
     window.innerHeight,
     {
       isStatic: true,
-      collisionFilter:{
-        mask :ballCategory
-      },
       render: {
         fillStyle: "transparent",
       },
     }
   );
    
-
-  // *************** create gravity enviroment ********************* //
-  engine.gravity.y = 0;
 
   // *************** create movement for bubble *******************//
   useDidUpdate(() => {
@@ -134,7 +124,7 @@ const Scene = () => {
     });
 
     const tempBubbles = [];
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 20; i++) {
         createCryptoBubble("SAFE", 12.5, iconCrypto, 60, (url) => {
           const bubble = Bodies.circle(
             random(0, window.innerWidth),
@@ -142,11 +132,13 @@ const Scene = () => {
             60,
             {
               restitution: 0.8,
-              force:{x:random(-0.2,0.2),y:random(-0.2,0.2)},
-              torque:10,
-              collisionFilter:{
-                category: ballCategory,
-                mask: wallCategory,
+              force:{x:random(-0.01,0.01),y:random(-0.01,0.01)},
+              // collisionFilter:{
+                // category: ballCategory,
+                // mask: wallCategory,
+              // },
+              collision: {
+                depth: -10,
               },
               render: {
                 sprite: {
@@ -171,7 +163,13 @@ const Scene = () => {
       rightWall,
     ]);
 
+    Events.on(engine,'collisionStart',function(event){
+    console.log(event)
+    const pair = event.pairs[0];
+    Matter.Body.set(pair.bodyB,{depth: -5})
+    })
 
+    
     // run the renderer
     Render.run(render);
 

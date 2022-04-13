@@ -16,7 +16,7 @@ function createCryptoBubble(
   //create bubble
   let gradient;
   ctx.arc(diameter, diameter, diameter * 0.85, 0, 2 * Math.PI);
-  ctx.fillStyle = "rgb(55 31 31 / 75%)";
+  ctx.fillStyle = "rgb(124 221 124 / 11%)";
   ctx.fill();
 
   gradient = ctx.createRadialGradient(
@@ -27,8 +27,8 @@ function createCryptoBubble(
     diameter,
     diameter
   );
-  gradient.addColorStop(0, "rgb(55 31 31 / 75%)");
-  gradient.addColorStop(1, "red");
+  gradient.addColorStop(0, "rgb(124 221 124 / 11%)");
+  gradient.addColorStop(1, "rgb(11 221 11)");
   ctx.strokeStyle = gradient;
   ctx.lineWidth = diameter * 0.3;
   ctx.stroke();
