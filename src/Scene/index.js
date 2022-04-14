@@ -10,6 +10,7 @@ import Matter, {
   Events,
   Pairs,
   Vertices,
+  Composites
 } from "matter-js";
 
 import MatterAttractors from 'matter-attractors';
@@ -94,6 +95,46 @@ const Scene = () => {
 
   // *************** create movement for bubble *******************//
   useDidUpdate(() => {
+    Matter.Bounds.create = function(vertices) {
+      var bounds = { 
+          min : {  x : 0 ,  y : 0  } , 
+          max: { x: 0, y: 0 }
+      } ;
+
+      if (vertices)
+          Matter.Bounds.update(bounds, vertices);
+      
+      return bounds;
+  } ;
+  Matter.Bounds.update = function(bounds, vertices, velocity) {
+    bounds.min.x = 0;
+    bounds.max.x = 0;
+    bounds.min.y = 0;
+    bounds.max.y = 0;
+
+    for (var i = 0; i < vertices.length; i++) {
+        var vertex = vertices[i];
+        if (vertex.x > bounds.max.x) bounds.max.x = vertex.x;
+        if (vertex.x < bounds.min.x) bounds.min.x = vertex.x;
+        if (vertex.y > bounds.max.y) bounds.max.y = vertex.y;
+        if (vertex.y < bounds.min.y) bounds.min.y = vertex.y;
+    }
+    
+    if (velocity) {
+        if (velocity.x > 0) {
+            bounds.max.x += velocity.x;
+        } else {
+            bounds.min.x += velocity.x;
+        }
+        
+        if (velocity.y > 0) {
+            bounds.max.y += velocity.y;
+        } else {
+            bounds.min.y += velocity.y;
+        }
+    }
+  } ;
+
     setInterval(() => {
       for (const bubble of bubbles) {
         Matter.Body.applyForce(bubble, bubble.position, {
@@ -101,8 +142,6 @@ const Scene = () => {
           y: random(-0.003, 0.003),
         });
 
-        Matter.Body.set(bubble,{depth : 10})
-        Matter.Body.setDensity(bubble, 0.001)
       }
     }, 1000);
   }, [bubbles]);
@@ -134,7 +173,7 @@ const Scene = () => {
     });
 
     const tempBubbles = [];
-      for (let i = 0; i < 2; i++) {
+      for (let i = 0; i < 10; i++) {
         createCryptoBubble("SAFE", 12.5, iconCrypto, 60, (url) => {
           const bubble = Bodies.circle(
             random(0, window.innerWidth),
@@ -154,8 +193,8 @@ const Scene = () => {
                 },
               },
             },
-          );
-
+          )
+          
           World.add(world, bubble);
           tempBubbles.push(bubble);
         });
@@ -170,32 +209,6 @@ const Scene = () => {
       leftWall,
       rightWall,
     ]);
-
-    Events.on(mouseConstraint,'startdrag',function (event) {
-      // console.log(event)
-      // const chooseBubble = event.body;
-      //  for(const bubble of tempBubbles){
-      //    if(bubble.id === chooseBubble.id){
-      //     Matter.Body.set(bubble,{
-      //        collisionFilter:0,
-      //     })
-      //    }
-      //  }
-    })
-
-    Events.on(mouseConstraint,'startdrag',function (event) {
-      console.log(tempBubbles[0])
-      Matter.Engine.update(engine);
-      Matter.Body.setVelocity(tempBubbles[0],tempBubbles[0].velocity);
-      // const pair = event.pairs[0].collision;
-      // const bodyA = pair.bodyA;
-      // const bodyB = pair.bodyB;
-      //  for(const bubble of tempBubbles){
-      //    if(bubble.id === bodyA.id && (bodyA.label || bodyB.label) !== 'Rectangle Body'){
-      //     Matter.Body.set(bubble,)
-      //    }
-      //  }
-    })
 
     // run the renderer
     Render.run(render);
