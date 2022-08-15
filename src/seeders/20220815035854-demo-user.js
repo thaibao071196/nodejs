@@ -1,4 +1,6 @@
 "use strict";
+const bcrypt = require("bcryptjs");
+const salt = bcrypt.genSaltSync(10);
 
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -9,11 +11,12 @@ module.exports = {
           firstName: "nguyen",
           lastName: "bao",
           email: "thaibao071196@gmail.com",
-          password: "123456",
+          password: await bcrypt.hashSync("helloae43", salt),
           address: "da nang",
           gender: 1,
-          typeRole: "ROLE",
-          keyRole: "R1",
+          phoneNumber: "84787509651",
+          positionId: "",
+          image: "",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
